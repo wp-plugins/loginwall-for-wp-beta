@@ -253,15 +253,14 @@ function show_loginwall(){
     {
         if ($_GET['action']=='lostpassword')
         {
-            $my_url = site_url()."/wp-login.php?action=setpassword";
-            $_SESSION['state'] = md5(uniqid(rand(), TRUE)); //CSRF protection
-         $dialog_url = $server."/wpreset.php?client_id="
-           . $app_id . "&reset_uri=" . urlencode($my_url). "&login_uri=" . urlencode($my_url) . "&state="
-           . $_SESSION['state']."&usercode=".$code;
+                $my_url = site_url()."/wp-login.php?action=setpassword";
+                $_SESSION['state'] = md5(uniqid(rand(), TRUE)); //CSRF protection
+             $dialog_url = $server."/wpreset.php?client_id="
+               . $app_id . "&reset_uri=" . urlencode($my_url). "&login_uri=" . urlencode($my_url) . "&state="
+               . $_SESSION['state']."&usercode=".$code;
 
-         wp_redirect($dialog_url);
-         exit;
-
+             wp_redirect($dialog_url);
+             exit;            
         }
         //if($_REQUEST['state'] == $_SESSION['state']) {
             $data_url = $server . "/api/auth.php?"
@@ -327,6 +326,7 @@ function loginwall_add_link($links, $file) {
 }
 
 function loginwall_settings_page() {
+    $error = '';
     $server = "https://login.loginwall.com/";
 
     $app_id = get_option("loginwall_ikey");
@@ -374,9 +374,17 @@ function loginwall_settings_page() {
 
          $_SESSION['state'] = md5(uniqid(rand(), TRUE)); //CSRF protection
 
+         if ($app_id!='')
+        {
+
          $dialog_url = $server."/wpreset.php?client_id="
        . $app_id . "&reset_uri=" . urlencode($my_url) ."&login_uri=" . urlencode($my_url) . "&usercode="
        . $answer->code."&state=".$_SESSION['state'];
+        }
+        else
+        {
+            $error = "You must insert integration key and secret key and click save before you can set your LoginWall Password.";
+        }
     }
 
 ?>
@@ -397,7 +405,7 @@ function loginwall_settings_page() {
         }
         else
         {
-            echo '<a href="options-general.php?page=loginwall&action=reset">Change password</a>';
+            echo '<a href="options-general.php?page=loginwall&action=reset">Change password</a><br>'.$error;
         }
         ?>
     </div>
