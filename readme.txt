@@ -33,7 +33,7 @@ LoginWall's password is the way to block hackers from getting your admin passwor
 
 Integrating LoginWall authentication with WordPress is very simple. Follow these quick installation steps:
 
-1.    Sign up for a free LoginWall account Here and follow the activation instructions.
+1.    Sign up for a free LoginWall account at http://www.loginwall.com/wordpress/ and follow the activation instructions.
 
 2.    After signing up you will get an email with your "Integration Key" and "Secret Key". you will need those values when you set up LoginWall plugin in WordPress.
 
