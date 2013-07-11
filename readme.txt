@@ -23,7 +23,7 @@ Features include:
 
 Why use LoginWall's password?
 
-The security threat report of 2013, made by SophosLabs ( http://www.sophos.com/en-us/security-news-trends/reports/security-threat-report/html-08.aspx), states that around 25,000 legitimate websites are infected daily with malware, which in turn, infects the visitors of these sites...
+The security threat report of 2013, made by SophosLabs, states that around 25,000 legitimate websites are infected daily with malware, which in turn, infects the visitors of these sites...
 
 Protecting your visitors from getting infected by your site is protecting your site from a malicious break in. And the easiest way to break into a web site, is by hacking the admin password.
 
