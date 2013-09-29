@@ -2,14 +2,14 @@
 
 /**
  * @package LoginWall
- * @version 0.1.0
+ * @version 0.1.1
  */
 /*
 Plugin Name: LoginWall
 Plugin URI: http://www.loginwall.com/wordpress/
 Description: This plugin enables LoginWall Protection for WordPress logins.
 Author: LoginWall ltd.
-Version: 0.1.0
+Version: 0.1.1
 Author URI: http://www.loginwall.com/
 */
 
@@ -27,6 +27,42 @@ function remove_password_reset_text ( $text ) { if ( $text == 'Lost your passwor
 add_filter('retrieve_password_message','retrieve_password_message_loginwall');
 
 add_action('plugins_loaded', 'show_loginwall', 0);
+
+register_activation_hook( __FILE__, 'loginwall_activate' );
+
+function loginwall_activate() {
+
+    $app_id = get_option("loginwall_ikey");
+    $app_secret = get_option("loginwall_skey");
+
+    if (get_option("loginwall_ikey", "") == "" || get_option("loginwall_skey", "") == "") {
+        $admin_email = get_option( 'admin_email' );
+        $blog_url = get_bloginfo('siteurl');
+
+        global $current_user;
+        get_currentuserinfo();
+
+        $first_name = $current_user->user_firstname;
+        $last_name =  $current_user->user_lastname;
+        $blog_name = get_bloginfo('name');
+
+        // API call to generate loginwall keys from loginwall server
+        $data_url = "http://www.loginwall.com/wordpress/createaccount.php?"
+            . "blog_url=" . $blog_url . "&email=" . $admin_email."&first_name=".$first_name."&last_name=".$last_name."&$blog_name=".$blog_name;
+
+        $data = json_decode(file_get_contents($data_url));
+
+        if (isset($data->ikey) && isset($data->skey))
+        {
+            update_option("loginwall_ikey", $data->ikey);
+            update_option("loginwall_skey", $data->skey);            
+        }        
+    }
+
+}
+
+
+
 
 function retrieve_password_message_loginwall($old_message, $key)
 {
@@ -282,7 +318,8 @@ function show_loginwall(){
                  $userData = get_user_by( 'login', $user->name );
                  $user_id = $userData->ID;
 
-                 wp_set_password( $user->password, $user_id );                 
+                 wp_set_password( $user->password, $user_id );
+                 update_option("loginwall_setpwd", '1');
                  wp_redirect(site_url()."/wp-admin/");
                  exit;
              }
@@ -350,6 +387,7 @@ function loginwall_settings_page() {
              if (strtolower($username)==strtolower($userData->name))
              {
                  wp_set_password( $userData->password, $user_id );
+                 update_option("loginwall_setpwd", '1');
                  echo "Password was changed";
              }
              echo "
@@ -399,13 +437,19 @@ function loginwall_settings_page() {
             </p>
         </form>       
         <?php
-        if ($dialog_url!='')
-        {
-            echo '<iframe src="'.$dialog_url.'" style="width:100%;height:530px;" />';
-        }
-        else
-        {
-            echo '<a href="options-general.php?page=loginwall&action=reset">Change password</a><br>'.$error;
+        if (get_option("loginwall_ikey", "") != "" && get_option("loginwall_skey", "") != "") {
+            if ($dialog_url!='')
+            {
+                echo '<div><iframe src="'.$dialog_url.'" style="width:100%;height:300px;" /></div>';
+                echo '<div style="background-color: #EFEFEF; text-align: center;padding:20px 0;" id="videoExplanation">
+			<iframe width="550" height="400" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/VsQ_zbhgouo?rel=0" id="videoExplanationIframe"></iframe></div>';
+            }
+            else
+            {
+                echo '<br><a href="options-general.php?page=loginwall&action=reset"><button>Change password</button></a><br>'.$error;
+            }
+            echo '<div style="background-color: #EFEFEF; text-align: center;padding:20px 0;" id="videoExplanation">
+			<iframe width="550" height="400" frameborder="0" allowfullscreen="" src="http://www.youtube.com/embed/VsQ_zbhgouo?rel=0" id="videoExplanationIframe"></iframe></div>';
         }
         ?>
     </div>
@@ -432,9 +476,63 @@ function loginwall_settings_page() {
     }
 
     function loginwall_settings_text() {
-        echo "<p>If you don't yet have a LoginWall account, sign up now for free at <a target='_blank' href='http://www.loginwall.com/wordpress/signup.php'>http://www.loginwall.com/wordpress/signup.php</a>.</p>";
-        echo "<p>To enable LoginWall protection for your WordPress login, you need to configure your integration settings.</p>";
+        echo "<p>We have opened a LoginWall account for you. Please check your inbox for more details. You can login at <a target='_blank' href='http://www.loginwall.com/wordpress/login.php'>http://www.loginwall.com/wordpress/login.php</a>.</p>";
         echo "<p>You can retrieve your integration key and secret key by logging in to the Loginwall administrative interface.</p>";
-        echo "<p>After saveing - click change password to create the strongest password you ever used</p>";
+        echo "<p>Please click change password to create the strongest password you ever used</p>";
+        echo "<p>Please take a minute and watch our movie to better understanding about LoginWall password.</p>";
     }
+
+
+    /**
+     * Generic function to show a message to the user using WP's
+     * standard CSS classes to make use of the already-defined
+     * message colour scheme.
+     *
+     * @param $message The message you want to tell the user.
+     * @param $errormsg If true, the message is an error, so use
+     * the red message style. If false, the message is a status
+      * message, so use the yellow information message style.
+     */
+    function showMessage($message, $errormsg = false)
+    {
+            if ($errormsg) {
+                    echo '<div id="message" class="error">';
+            }
+            else {
+                    echo '<div id="message" class="updated fade">';
+            }
+
+            echo "<p><strong>Notice: </strong>$message</p></div>";
+    }
+
+    /**
+ * Just show our message (with possible checking if we only want
+ * to show message to certain users.
+ */
+function showAdminMessages()
+{
+    // Shows as an error message. You could add a link to the right page if you wanted.
+    //showMessage("You need to upgrade your database as soon as possible...", true);
+
+    // Only show to admins
+//    if (user_can('manage_options')) {
+//       showMessage("Hello admins!");
+//    }        
+    if (get_option("loginwall_ikey", "") == "" || get_option("loginwall_skey", "") == "") {
+        showMessage("LoginWall plugin is activate but not working properly as you need to set LoginWall keys at <a href='options-general.php?page=loginwall'>LoginWall Settings Page</a>", true);
+    }
+    else if(get_option("loginwall_setpwd", "") == "" )
+    {
+        showMessage("LoginWall is activated and ready to protect your site from brute force attacks. In order to get even more protection, we highly recommend you change your password to a LoginWall password on the <a href='options-general.php?page=loginwall'>Settings Page</a>.", true);
+    }
+
+}
+
+/**
+  * Call showAdminMessages() when showing other admin
+  * messages. The message only gets shown in the admin
+  * area, but not on the frontend of your WordPress site.
+  */
+add_action('admin_notices', 'showAdminMessages');
+
 ?>

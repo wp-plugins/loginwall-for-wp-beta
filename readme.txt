@@ -3,7 +3,7 @@ Contributors: LoginWall
 Tags:  attack, authentication, block, brute, brute force, force, hack, lock, login, password, password strength, passwords, security, strength, strong, strong passwords, users
 Requires at least: 3.0
 Tested up to: 3.6
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 
 Security against all current password hacking techniques and more....
@@ -33,21 +33,15 @@ LoginWall's password is the way to block hackers from getting your admin passwor
 
 Integrating LoginWall authentication with WordPress is very simple. Follow these quick installation steps:
 
-1.    Sign up for a free LoginWall account at http://www.loginwall.com/wordpress/ and follow the activation instructions.
+1. Install using the WordPress Gallery for the easiest installation or download, unzip and upload the LoginWall files to your /wp-content/plugins/ directory.
 
-2.    After signing up you will get an email with your "Integration Key" and "Secret Key". you will need those values when you set up LoginWall plugin in WordPress.
+2.    Please make sure you know your admin username before installation - auto complete will stop working
 
-3.    Download the plugin. (Currently Beta version)
+3.    From your WordPress dashboard, activate LoginWall WordPress plugin.
 
-4.    Unzip it and upload to wp-content/plugin/
+4.   You will get an email with all the details that were filled in the LoginWall WordPress plugin settings.
 
-5.    Please make sure you know your admin username before installation - auto complete will stop working
-
-6.    From your WordPress dashboard, activate LoginWall WordPress plugin.
-
-7.   In the LoginWall WordPress plugin settings, fill in the "Integration Key" and "Secret Key" with the values provided in the email you received in Step 2.
-
-8.   Change your password to LoginWall password (from LoginWall settings page) to get better protection.
+5.   Change your password to LoginWall password (from LoginWall settings page) to get better protection.
 
     All done!
     Log out of your WordPress account. When you log back in, you'll be prompted to insert your LoginWall password.
@@ -102,6 +96,10 @@ Currently, this free version is only for admin accounts. LoginWall will protect 
 
 == Changelog ==
 
+= Beta 0.1.1
+
+* Auto create LoginWall account
+* Show messages on the Admin area
 = Beta 0.1.0 =
 
 * Initial Beta release!
@@ -109,6 +107,9 @@ Currently, this free version is only for admin accounts. LoginWall will protect 
 * Brute-force protection
 
 == Upgrade Notice ==
+
+= Beta 0.1.1
+
 
 = Beta 0.1.0 =
 * Initial Beta release!
